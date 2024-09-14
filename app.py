@@ -1,13 +1,14 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, flash, url_for
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # For flashing messages
 
 # Initialize SQLite DB
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    
+
     # Create users table if it doesn't exist
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -41,10 +42,13 @@ def login():
     conn.commit()
     conn.close()
 
-    # Redirect to the next page after login
-    return redirect('/next')
+    # Flash a success message
+    flash('Login successful! You may proceed manually to the next page by entering /next in the URL.')
+    
+    # Reload the index page after login
+    return redirect(url_for('index'))
 
-# Route to display the last entered data
+# Route to display the last entered data (only accessible manually)
 @app.route('/next')
 def next_page():
     conn = sqlite3.connect('users.db')

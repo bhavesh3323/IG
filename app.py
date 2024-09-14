@@ -43,7 +43,7 @@ def login():
     conn.close()
 
     # Flash a success message
-    flash('Login successful! You may proceed manually to the next page by entering /next in the URL.')
+    flash('Login successful!')
     
     # Reload the index page after login
     return redirect(url_for('index'))
